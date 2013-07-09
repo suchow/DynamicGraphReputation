@@ -1,64 +1,56 @@
 function results = Simulator(s)
   
-  % derivative parameters
-  isRewireRound = rand(1,s.numRounds) < s.pRewireRound;
-
-  % create the initial pop
+  % create the initial population
   pop.graph = MakeAdjacencyMatrix(s.graphType, s.N) > 0;
-  pop.strategies = generateRandomStrategies(s.N); %
+  pop.strategies = generateRandomStrategies(s.N);
   
   for i = 1:s.numRounds
     
-    % rewire round
-    if(rand < s.pRewireRound)
+    if(rand() < s.pRewireRound) % link update round
       
-      % pick a random link, players(1) makes the choice
-      [j,k] = find(pop.graph);
-      link = randi(length(j));
-      players(1) = j(link);
-      players(2) = k(link);
-                 
-      % rewiring is conditional on players(2)'s gameplay strategy
-      player1strategy = pop.strategies(players(1),:);
-      player2strategy = pop.strategies(players(2),:);
-      rewire = rand() < player1strategy(player2strategy(1)+1);
-      if(rewire)
-        % preferential attachment to unlinked players w/ Luce choice exponent
-        unlinkedPlayers = find(~pop.graph(players(1),:));    
-        degree = full(sum(pop.graph, 1));
-        L = player1strategy(4);
-        p = (degree(unlinkedPlayers).^L)/sum(degree(unlinkedPlayers).^L);
-        newConnection = unlinkedPlayers(randp(p));
+      % select a random player
+      player1 = randi(s.N);
       
-        % remove the old connection; form the new one
-        pop.graph(players(1),players(2)) = 0;
-        pop.graph(players(1),newConnection) = 1;
+      % select one of that player's existing links
+      links = find(pop.graph(player1,:));
+      if(~isempty(links))
+        player2 = links(randi(length(links)));
+        
+        % the rewiring decision is conditional of player2's behavior
+        player2Cooperates = rand() < pop.strategies(player2,1);
+        rewire = (rand() < pop.strategies(player1, player2Cooperates+2));
+    
+        if(rewire)
+          % preferential attachment to unlinked players w/ Luce choice exponent
+          unlinkedPlayers = find(~pop.graph(player1,:));
+          if(~isempty(unlinkedPlayers))
+            degree = full(sum(pop.graph, 1));
+            L = pop.strategies(player1,4);
+            signal = (1+degree(unlinkedPlayers)).^L;
+            newLink = unlinkedPlayers(randp(signal./sum(signal)));
+    
+            % remove the old connection; form the new one
+            pop.graph(player1,player2) = 0;
+            pop.graph(player2,player1) = 0;
+            pop.graph(player1,newLink) = 1;
+            pop.graph(newLink,player1) = 1;
+          end
+        end  
       end
 
-
-    % playing round  
-    else
+    else % strategy update round  
+      
+      players = shuffle(1:s.N); % student is players(1), teacher is players(2)
+      
       if(rand() < s.pMutation)
-        pop.strategies(randi(s.N),:) = generateRandomStrategies(1);
+        pop.strategies(players(1),:) = generateRandomStrategies(1);
       else
-        % simulate a pairwise comparison process: choose a pair of players,
-        % assign one the role of student, the other the role of teacher.
-        % the student takes on the teacher's strategy with probability
-        % proportional to payoff. implicit in this model is a replacement
-        % network that is complete.
-        players = shuffle(1:s.N);
-        payoffs(1) = playWithNeighbors(players(1)); % student
         if(strcmp(s.process,'Pairwise'))
-          % simulate a pairwise comparison process: choose a pair of players,
-          % assign one the role of student, the other the role of teacher.
-          % the student takes on the teacher's strategy with probability
-          % proportional to payoff. implicit in this model is a replacement
-          % network that is complete.
-          players = shuffle(1:s.N);
           payoffs(1) = playWithNeighbors(players(1)); % student
           payoffs(2) = playWithNeighbors(players(2)); % teacher
         
-          isReplace = rand() < payoffs(2)/sum(payoffs(1:2));
+          % replacement determined by fermi function
+          isReplace = rand() < 1/(1+exp(-s.beta*(payoffs(2)-payoffs(1))));
           if(isReplace)
             pop.strategies(players(1),:) = pop.strategies(players(2),:);
           end
@@ -68,29 +60,37 @@ function results = Simulator(s)
             payoffs(j) = playWithNeighbors(j);
           end
           toReplicate = randp(payoffs./sum(payoffs));
-          pop.strategies(randi(s.N),:) = pop.strategies(toReplicate,:);
+          pop.strategies(players(1),:) = pop.strategies(toReplicate,:);
         end
       end
     end
     % store results
-    results.history(i) = pop;
+    results.history(i,:) = mean(pop.strategies);
+    if(~mod(i,100))
+      results.history(i,:)
+    end
   end
   
-  % play a game between player and each of its neighbors
+  % play a game between the player and each of its neighbors
   function payoff = playWithNeighbors(player)
-    neighbors = find(pop.graph(player,:));
-    for k = 1:length(neighbors)
-      payoff(k) = s.payoffMatrix(pop.strategies(player,1),...
-                                 pop.strategies(neighbors(k),1));
-    end
-    payoff = sum(payoff);
+    % compute total cost
+    numNeighbors = sum(pop.graph(player,:));
+    totalCost = s.cost * sum(rand(1,numNeighbors) < pop.strategies(player,1));
+    
+    % compute total benefit
+    pCooperate = pop.strategies(full(pop.graph(:,player)),1);
+    isCooperating = rand(length(pCooperate),1) < pCooperate;
+    totalBenefit = s.benefit * sum(isCooperating);
+    
+    % compute final payoff
+    payoff = totalBenefit - totalCost;
   end
   
   % TODO: add noise epsilon
   function str = generateRandomStrategies(N)
-    str(:,1) = 1 + (rand(N,1) > s.pCooperator);% allC = 1, allD = 2
-    str(:,2) = rand(N,1);                      % P(rewire|opponentIsCooperator)
-    str(:,3) = rand(N,1);                      % P(rewire|opponentIsDefector)
-    str(:,4) = s.luceMean+s.luceSD*randn(N,1);    % Luce choice exponent
+    str(:,1) = rand(N,1);                      % probability of cooperating
+    str(:,2) = rand(N,1);                      % P(rewire|opponentIsDefector)
+    str(:,3) = rand(N,1);                      % P(rewire|opponentIsCooperator)
+    str(:,4) = s.luceMean+s.luceSD*randn(N,1); % Luce choice exponent
   end
 end
