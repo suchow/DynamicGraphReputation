@@ -11,11 +11,16 @@ function results = Simulator(s)
     
     % rewire round
     if(rand < s.pRewireRound)
-      % pick a random connection, player 1 makes the choice
-      players = shuffle(1:s.N);
+      
+      % pick a random link, players(1) makes the choice
+      [j,k] = find(pop.graph);
+      link = randi(length(j));
+      players(1) = j(link);
+      players(2) = k(link);
+                 
+      % rewiring is conditional on players(2)'s gameplay strategy
       player1strategy = pop.strategies(players(1),:);
       player2strategy = pop.strategies(players(2),:);
-      
       rewire = rand() < player1strategy(player2strategy(1)+1);
       if(rewire)
         % preferential attachment to unlinked players w/ Luce choice exponent
