@@ -43,11 +43,27 @@ function results = Simulator(s)
         % network that is complete.
         players = shuffle(1:s.N);
         payoffs(1) = playWithNeighbors(players(1)); % student
-        payoffs(2) = playWithNeighbors(players(2)); % teacher
+        if(strcmp(s.process,'Pairwise'))
+          % simulate a pairwise comparison process: choose a pair of players,
+          % assign one the role of student, the other the role of teacher.
+          % the student takes on the teacher's strategy with probability
+          % proportional to payoff. implicit in this model is a replacement
+          % network that is complete.
+          players = shuffle(1:s.N);
+          payoffs(1) = playWithNeighbors(players(1)); % student
+          payoffs(2) = playWithNeighbors(players(2)); % teacher
         
-        isReplace = rand() < payoffs(2)/sum(payoffs);
-        if(isReplace)
-          pop.strategies(players(1),:) = pop.strategies(players(2),:);
+          isReplace = rand() < payoffs(2)/sum(payoffs(1:2));
+          if(isReplace)
+            pop.strategies(players(1),:) = pop.strategies(players(2),:);
+          end
+        
+        elseif(strcmp(s.process,'Moran'))
+          for j = 1:s.N
+            payoffs(j) = playWithNeighbors(j);
+          end
+          toReplicate = randp(payoffs./sum(payoffs));
+          pop.strategies(randi(s.N),:) = pop.strategies(toReplicate,:);
         end
       end
     end
