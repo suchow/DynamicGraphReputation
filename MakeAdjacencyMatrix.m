@@ -42,10 +42,12 @@ function [w,varargout] = MakeAdjacencyMatrix(graphType,N,varargin)
     while(~all(sum(w,2) ~= 0)) % resample all empty rows
       emptyRows = (sum(w,2) == 0);
       w(emptyRows,:) = (rand(sum(emptyRows),N) < p);
+      w2 = w'; % make symmetric step 1
+      t = triu(true(size(w2)),1);
+      w(t) = w2(t);
       w = w - diag(diag(w)); % zero out diagonal    
-    end  
+    end
     w = rownormalize(w);
-
 
   % Square lattice connected to its von Neumann neighborhood
   case 'Square lattice 4'
