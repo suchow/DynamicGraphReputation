@@ -11,11 +11,11 @@ function results = Simulator(s)
     
     % rewire round
     if(rand < s.pRewireRound)
-      %display('rewire')
       % pick a random connection, player 1 makes the choice
       players = shuffle(1:s.N);
       player1strategy = pop.strategies(players(1),:);
       player2strategy = pop.strategies(players(2),:);
+      
       rewire = rand() < player1strategy(player2strategy(1)+1);
       if(rewire)
         degree = full(sum(pop.graph > 0, 2));
@@ -55,20 +55,14 @@ function results = Simulator(s)
     results.history(i) = pop;
   end
   
-  %
+  % play a game between player and each of its neighbors
   function payoff = playWithNeighbors(player)
     neighbors = find(pop.graph(player,:));
     for k = 1:length(neighbors)
-      payoff(k) = playGame(pop.strategies(player,:), ...
-                           pop.strategies(neighbors(k),:));
+      payoff(k) = s.payoffMatrix(pop.strategies(player,1),...
+                                 pop.strategies(neighbors(k),1));
     end
     payoff = sum(payoff);
-  end
-  
-  % plays a game between players with strategies s1 and s2
-  function [p1, p2] = playGame(s1, s2)
-    p1 = s.payoffMatrix(s1(1),s2(1));
-    p2 = s.payoffMatrix(s2(1),s1(1));
   end
   
   % TODO: add noise epsilon
