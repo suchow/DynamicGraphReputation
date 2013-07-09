@@ -9,6 +9,8 @@ function results = Simulation1
 	s.pRewireRound = 0.1;                  % probability of a rewire round
 	s.pMutation = 0.1;                     % probability of mutating on play round
 	s.luceExponentSD = 2;                  % standard deviation of Luce choice exp
+	s.luceMean = 1;
+	s.luceSD = 2;                     % standard deviation of Luce choice exp
 	s.process = 'Pairwise';             % either 'Pairwise' or 'Moran'
 	
 	results = Simulator(s)

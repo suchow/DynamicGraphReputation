@@ -86,6 +86,6 @@ function results = Simulator(s)
     str(:,1) = 1 + (rand(N,1) > s.pCooperator);% allC = 1, allD = 2
     str(:,2) = rand(N,1);                      % P(rewire|opponentIsCooperator)
     str(:,3) = rand(N,1);                      % P(rewire|opponentIsDefector)
-    str(:,4) = s.luceExponentSD*randn(N,1);    % Luce choice exponent
+    str(:,4) = s.luceMean+s.luceSD*randn(N,1);    % Luce choice exponent
   end
 end
