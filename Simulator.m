@@ -4,7 +4,7 @@ function results = Simulator(s)
   isRewireRound = rand(1,s.numRounds) < s.pRewireRound;
 
   % create the initial pop
-  pop.graph = MakeAdjacencyMatrix(s.graphType, s.N);
+  pop.graph = MakeAdjacencyMatrix(s.graphType, s.N) > 0;
   pop.strategies = generateRandomStrategies(s.N); %
   
   for i = 1:s.numRounds
@@ -25,16 +25,16 @@ function results = Simulator(s)
       if(rewire)
         % preferential attachment to unlinked players w/ Luce choice exponent
         unlinkedPlayers = find(~pop.graph(players(1),:));    
-        degree = full(sum(pop.graph > 0, 2));
+        degree = full(sum(pop.graph, 1));
         L = player1strategy(4);
         p = (degree(unlinkedPlayers).^L)/sum(degree(unlinkedPlayers).^L);
         newConnection = unlinkedPlayers(randp(p));
-        
+      
         % remove the old connection; form the new one
         pop.graph(players(1),players(2)) = 0;
         pop.graph(players(1),newConnection) = 1;
-        pop.graph = rownormalize(pop.graph);
       end
+
 
     % playing round  
     else
