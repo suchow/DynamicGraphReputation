@@ -11,5 +11,4 @@ function results = Simulation1
 	s.luceExponentSD = 2;                  % standard deviation of Luce choice exp
 	
 	results = Simulator(s)
-
 end

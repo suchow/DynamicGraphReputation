@@ -18,11 +18,12 @@ function results = Simulator(s)
       
       rewire = rand() < player1strategy(player2strategy(1)+1);
       if(rewire)
+        % preferential attachment to unlinked players w/ Luce choice exponent
+        unlinkedPlayers = find(~pop.graph(players(1),:));    
         degree = full(sum(pop.graph > 0, 2));
-        unlinkedIndices = find(~pop.graph(players(1),:));    
         L = player1strategy(4);
-        p = (degree(unlinkedIndices).^L)/sum(degree(unlinkedIndices).^L);
-        newConnection = unlinkedIndices(randp(p));
+        p = (degree(unlinkedPlayers).^L)/sum(degree(unlinkedPlayers).^L);
+        newConnection = unlinkedPlayers(randp(p));
         
         % remove the old connection; form the new one
         pop.graph(players(1),players(2)) = 0;
@@ -32,7 +33,6 @@ function results = Simulator(s)
 
     % playing round  
     else
-      %display('--play--')
       if(rand() < s.pMutation)
         pop.strategies(randi(s.N),:) = generateRandomStrategies(1);
       else
