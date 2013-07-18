@@ -44,7 +44,7 @@ function results = Simulator(s)
           if(~isempty(unlinkedPlayers))
             degree = full(sum(pop.graph, 1));
             L = pop.strategies(player1,4);
-            signal = (1+degree(unlinkedPlayers)).^L;
+            signal = (0.01+degree(unlinkedPlayers)).^L; % to avoid 0^0
             newLink = unlinkedPlayers(randp(signal./sum(signal)));
     
             % remove the old connection; form the new one
@@ -104,8 +104,6 @@ function results = Simulator(s)
   % TODO: add noise epsilon
   function str = generateRandomStrategies(N)
     str(:,1) = rand(N,1);                      % probability of cooperating
-    str(:,2) = rand(N,1);                      % P(rewire|opponentIsDefector)
-    str(:,3) = rand(N,1);                      % P(rewire|opponentIsCooperator)
     if(s.isStrategyBinary)
       str(:,1) = str(:,1) > 0.5;
     end
