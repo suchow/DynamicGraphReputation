@@ -4,6 +4,15 @@ function results = Simulator(s)
   pop.graph = MakeAdjacencyMatrix(s.graphType, s.N) > 0;
   pop.strategies = generateRandomStrategies(s.N);
   
+  % initialize the population's strategies
+  if(strcmp(s.initial,'random'))
+    pop.strategies = generateRandomStrategies(s.N);
+  elseif(strcmp(s.initial,'zeroed'))
+    pop.strategies(:,1) = zeros(s.N,1);  % probability of cooperating
+    pop.strategies(:,2) = zeros(s.N,1);  % P(rewire|opponentIsDefector)
+    pop.strategies(:,3) = zeros(s.N,1);  % P(rewire|opponentIsCooperator)
+    pop.strategies(:,4) = s.luceMean+s.luceSD*randn(s.N,1); % Luce choice exponent
+  end
   if(s.isStrategyBinary)
     pop.strategies(:,1) = pop.strategies(:,1) > 0.5;
   end
