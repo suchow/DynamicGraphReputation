@@ -109,6 +109,13 @@ function results = Simulator(s)
     if(s.isStrategyBinary)
       str(:,1) = str(:,1) > 0.5;
     end
+    if(isnumeric(s.fixedRewiring))
+      str(:,2) = s.fixedRewiring(1) * ones(N,1);
+      str(:,3) = s.fixedRewiring(2) * ones(N,1);
+    else
+      str(:,2) = rand(N,1);                    % P(rewire|opponentDefects)
+      str(:,3) = rand(N,1);                    % P(rewire|opponentCooperates)
+    end
     str(:,4) = s.luceMean+s.luceSD*randn(N,1); % Luce choice exponent
   end
 end
