@@ -1,0 +1,19 @@
+function s = defaultSettings()
+	s.N = 75;                           % pop size
+	s.numRuns = 10;                     % how many runs of simulation
+	s.graphType = 'Erdos-Renyi';        % initial network structure
+	s.graphDensity = 0.1;
+	s.numSteps = 100000;                % total number of rounds
+	s.cost = 1;                         % cost to self of altruistic act
+	s.benefit = 100;                    % benefit to neighbors for cooperating
+	s.pRewireRound = 0.5;               % probability of having a rewire round
+	s.pMutation = 0.01;                 % probability of mutating on play round
+	s.luceMean = 0;                     % Luce choice exponent
+	s.luceSD = 0;                       % standard deviation of Luce choice exp
+	s.process = 'Pairwise';             % either 'Pairwise' or 'Moran'
+	s.beta = 0.001;                     % intensity of selection in pairwise cmp
+	s.isStrategyBinary = false;         % graded or binary strategies
+	s.initial = 'zeroed';               % 'random' or 'zeroed' out strategies
+	s.fixedRewiring = [1 0];            % 'false' or [rewire|Defect, ...|Coop]
+	s.verbose = false;                  % print status messages while running?
+end

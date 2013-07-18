@@ -6,6 +6,7 @@
 % is explored. Higher choice exponents (i.e., greater dependence on
 % popularity) leads to greater levels of cooperation.
 function r = Simulation1()
+  s = defaultSettings();            
   r = exploreParameter(s, 'luceMean', [-10,0,10])
   plotTimecourse(r);
 end
