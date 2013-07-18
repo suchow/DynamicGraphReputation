@@ -1,9 +1,4 @@
-% Builds a function that, given indices i,j < N, returns the transition
-% probability for a graph of type graphType with N nodes. The available
-% graphTypes include:
-%   Complete graph
-%   ...
-%
+% Returns the transition matrix for the given graph type
 function [w,varargout] = MakeAdjacencyMatrix(graphType,N,varargin)
   
   switch graphType
