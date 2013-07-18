@@ -78,13 +78,12 @@ function results = Simulator(s)
   % play a game between the player and each of its neighbors
   function payoff = playWithNeighbors(player)
     % compute total cost
-    numNeighbors = sum(pop.graph(player,:));
-    totalCost = s.cost * sum(rand(1,numNeighbors) < pop.strategies(player,1));
+    numNeighbors = full(sum(pop.graph(player,:)));
+    totalCost = s.cost * numNeighbors * pop.strategies(player,1);
     
     % compute total benefit
     pCooperate = pop.strategies(full(pop.graph(:,player)),1);
-    isCooperating = rand(length(pCooperate),1) < pCooperate;
-    totalBenefit = s.benefit * sum(isCooperating);
+    totalBenefit = sum(s.benefit * pCooperate);
     
     % compute final payoff
     payoff = totalBenefit - totalCost;
