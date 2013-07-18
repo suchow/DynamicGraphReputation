@@ -16,4 +16,5 @@ function results = Simulation1
 	results = Simulator(s)
 	s.isStrategyBinary = false;         % graded or binary strategies
 	s.initial = 'zeroed';               % start with either 'random' strategies,
-end
+end  r = exploreParameter(s, 'luceMean', [-10,0,10])
+  plotTimecourse(r);
