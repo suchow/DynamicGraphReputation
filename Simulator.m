@@ -3,6 +3,9 @@ function results = Simulator(s)
   % create the initial population
   pop.graph = MakeAdjacencyMatrix(s.graphType, s.N) > 0;
   pop.strategies = generateRandomStrategies(s.N);
+  % preallocate results matrices
+  results.history = zeros(s.numSteps,4);
+  
   
   % initialize the population's strategies
   if(strcmp(s.initial,'random'))
@@ -79,8 +82,8 @@ function results = Simulator(s)
     end
     % store results
     results.history(i,:) = mean(pop.strategies);
-    if(~mod(i,100))
-      results.history(i,:)
+    if(~mod(i,10000) & s.verbose)
+      mean(pop.strategies)
     end
   end
   
