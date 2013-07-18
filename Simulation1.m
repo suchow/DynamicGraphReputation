@@ -1,20 +1,11 @@
-function results = Simulation1
-
-	% settings
-	s.N = 100;                             % pop size
-	s.graphType = 'Erdos-Renyi';           % initial network structure
-	s.numRounds = 2000;                    % total number of rounds
-	s.payoffMatrix = [3, 0; 5, 1];         % payoff matrix for the game
-	s.pCooperator = 0.5;                   % initial probability of playing allC
-	s.pRewireRound = 0.1;                  % probability of a rewire round
-	s.pMutation = 0.1;                     % probability of mutating on play round
-	s.luceExponentSD = 2;                  % standard deviation of Luce choice exp
-	s.luceMean = 1;
-	s.luceSD = 2;                     % standard deviation of Luce choice exp
-	s.process = 'Pairwise';             % either 'Pairwise' or 'Moran'
-	
-	results = Simulator(s)
-	s.isStrategyBinary = false;         % graded or binary strategies
-	s.initial = 'zeroed';               % start with either 'random' strategies,
-end  r = exploreParameter(s, 'luceMean', [-10,0,10])
+% Starts as a population of defectors who rewire if the opponent defects,
+% but not if they cooperate. Everyone always follows that policy. New mutants
+% get a random gameplay strategy. When forming a new link, neighbors are 
+% selected with a probability that is a function of their degree. This 
+% selection is controlled by a choice exponent. A range of choice exponents 
+% is explored. Higher choice exponents (i.e., greater dependence on
+% popularity) leads to greater levels of cooperation.
+function r = Simulation1()
+  r = exploreParameter(s, 'luceMean', [-10,0,10])
   plotTimecourse(r);
+end

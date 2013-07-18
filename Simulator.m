@@ -1,6 +1,8 @@
+%
+%
+%
 function results = Simulator(s)
   
-  pop.strategies = generateRandomStrategies(s.N);
   % preallocate results matrices
   results.history = zeros(s.numSteps,4);
   
@@ -12,15 +14,15 @@ function results = Simulator(s)
     pop.strategies = generateRandomStrategies(s.N);
   elseif(strcmp(s.initial,'zeroed'))
     pop.strategies(:,1) = zeros(s.N,1);  % probability of cooperating
-    pop.strategies(:,2) = zeros(s.N,1);  % P(rewire|opponentIsDefector)
-    pop.strategies(:,3) = zeros(s.N,1);  % P(rewire|opponentIsCooperator)
+    pop.strategies(:,2) = zeros(s.N,1);  % P(rewire|opponentDefects)
+    pop.strategies(:,3) = zeros(s.N,1);  % P(rewire|opponentCooperates)
     pop.strategies(:,4) = s.luceMean+s.luceSD*randn(s.N,1); % Luce choice exponent
   end
   if(s.isStrategyBinary)
     pop.strategies(:,1) = pop.strategies(:,1) > 0.5;
   end
 
-  for i = 1:s.numRounds
+  for i = 1:s.numSteps
     
     if(rand() < s.pRewireRound) % link update round
       
