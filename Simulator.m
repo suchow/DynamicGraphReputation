@@ -49,9 +49,7 @@ function results = Simulator(s)
     
             % remove the old connection; form the new one
             pop.graph(player1,player2) = 0;
-            pop.graph(player2,player1) = 0;
             pop.graph(player1,newLink) = 1;
-            pop.graph(newLink,player1) = 1;
           end
         end  
       end
