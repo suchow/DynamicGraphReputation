@@ -14,4 +14,5 @@ function results = Simulation1
 	s.process = 'Pairwise';             % either 'Pairwise' or 'Moran'
 	
 	results = Simulator(s)
+	s.isStrategyBinary = false;         % graded or binary strategies
 end

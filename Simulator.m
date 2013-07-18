@@ -4,6 +4,10 @@ function results = Simulator(s)
   pop.graph = MakeAdjacencyMatrix(s.graphType, s.N) > 0;
   pop.strategies = generateRandomStrategies(s.N);
   
+  if(s.isStrategyBinary)
+    pop.strategies(:,1) = pop.strategies(:,1) > 0.5;
+  end
+
   for i = 1:s.numRounds
     
     if(rand() < s.pRewireRound) % link update round
@@ -91,6 +95,9 @@ function results = Simulator(s)
     str(:,1) = rand(N,1);                      % probability of cooperating
     str(:,2) = rand(N,1);                      % P(rewire|opponentIsDefector)
     str(:,3) = rand(N,1);                      % P(rewire|opponentIsCooperator)
+    if(s.isStrategyBinary)
+      str(:,1) = str(:,1) > 0.5;
+    end
     str(:,4) = s.luceMean+s.luceSD*randn(N,1); % Luce choice exponent
   end
 end
